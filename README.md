@@ -99,7 +99,7 @@ The main objectives of this project are:
 
 Clone the repository:
 ```bash
-git clone https://github.com/yourusername/data-512-Final-Project.git
+git clone https://github.com/radhikasethi2011/data-512-Final-Project.git
 ```
 
 1. Navigate to the project directory and open `data-extraction-analysis.ipynb` in Jupyter Notebook or Jupyter Lab.
