@@ -62,11 +62,16 @@ The main objectives of this project are:
    - **Annual Aggregation of Smoke Estimates**: Each fire’s smoke impact is calculated using its size and distance from Boulder, and then summed annually to get yearly smoke estimates.
 
 2. **Calculating Smoke Impact**:
-   - **Formula**:
-     ```
-     Smoke Impact = (Fire Size in Acres) / (Distance from Boulder)^2
-     ```
-     This formula helps in weighting the impact of fires based on their proximity and size, giving more weight to closer, larger fires.
+   ### Calculating Smoke Impact
+
+The smoke impact for each fire is calculated using this formula:
+
+**Smoke Impact** = (GIS Acres × 15.625) / Distance
+
+In this formula:
+- **GIS Acres** represents the area of the fire in acres.
+- **Distance** is the distance of the fire from Boulder in miles.
+- The constant **15.625** is applied as a scaling factor to adjust the impact measurement. The formula implies that closer fires have a proportionally larger smoke impact on Boulder’s air quality.
 
 3. **Time Series Modeling**:
    - **SARIMA**: Seasonal ARIMA (SARIMA) is applied to forecast smoke exposure from wildfires up to 2050. The model accounts for both trend and seasonality in the historical smoke estimate data.
