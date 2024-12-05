@@ -1,124 +1,178 @@
+# Wildfire Impact Assessment on Boulder, Colorado: Data-512 Final Project
 
-# data-512-Final-Project: Wildfire Impact Assessment for Boulder, CO
+## Overview
 
-This repository contains the code, data, and analysis for assessing the impact of wildfires on air quality in Boulder, CO. The primary focus is to analyze historical wildfire data, calculate smoke exposure estimates, and correlate these estimates with AQI (Air Quality Index) values over time. Additionally, we employ time series models to forecast future smoke exposure trends up to 2050.
+This project investigates the impact of wildfire smoke on air quality and public health in Boulder, Colorado, by analyzing historical wildfire data, mortality rates, and air quality trends. Using data from the US Geological Survey (USGS), the CDC Wonder API, and the EPA Air Quality System (AQS) API, this study calculates smoke exposure estimates and correlates them with respiratory mortality trends. It also employs time series modeling to predict future smoke impacts up to 2050, offering actionable insights for policymakers and stakeholders.
 
-### Repository Structure
+The study aligns with human-centered data science principles, ensuring ethical handling of health and environmental data while communicating findings effectively to inform decision-making.
+
+---
+
+## Repository Structure
 
 ```
-data-512-Final-Project
-├── data
-│   ├── GeoJSON Exports                # Wildfire data files obtained from ScienceBase.gov
+data-512-Final-Project/
+│
+├── data/
+│   ├── GeoJSON Exports/
 │   │   ├── boulder_fires_final.json
+│   │   ├── boulder_1800fires_final.json
 │   │   ├── USGS_Wildland_Fire_Combined_Dataset.json
-│   │   ├── USGS_Wildland_Fire_Merged_Dataset.json
 │   │   ├── Wildland_Fire_Polygon_Metadata.xml
-│   ├── aqi_gaseous.csv                # AQI data for gaseous pollutants
-│   ├── aqi_particulate.csv            # AQI data for particulate pollutants
-│   ├── aqi_yoy.csv                    # Year-over-year AQI data
-│   ├── boulder_1800fires_final.json   # Filtered data for fires within 1800 miles of Boulder
-│   ├── boulder_fires_final.json       # Filtered data for fires within 650 miles of Boulder
-│   ├── gaseous_data.json              # AQI data processed for gaseous pollutants
-│   ├── particulate_data.json          # AQI data processed for particulate pollutants
-│   ├── Smoke_Estimate_Annual.csv      # Annual smoke estimates based on fire data
-├── scripts
-│   ├── data-extraction-analysis.ipynb # Main notebook for data extraction, analysis, and modeling
-│   ├── epa_air_quality_history_example.ipynb   # EPA air quality example notebook from professor
-│   ├── wildfire_geo_proximity_example.ipynb    # Wildfire geographic proximity example notebook from professor
-├── wildfire
-│   ├── Reader.py                      # Provided reader for handling wildfire data
-│   ├── Wildfire_short_sample_2024.json # Sample JSON file for testing
-├── .gitignore                         # Git ignore file for excluding unnecessary files
-├── LICENSE                            # License file for the project
-└── README.md                          # Project README file (you are here)
+│   ├── cleaned_Smoke_Estimate_Annual.csv
+│   ├── Refined_Underlying_Cause_of_Death.txt
+│   ├── AQI Data (aqi_gaseous.csv, aqi_particulate.csv, etc.)
+│   └── Wildfire.zip
+│
+├── scripts/
+│   ├── data-extraction-analysis.ipynb
+│   ├── part-2-analysis.ipynb
+│   ├── epa_air_quality_history_example.ipynb
+│   └── wildfire_geo_proximity_example.ipynb
+│
+├── wildfire/
+│   ├── Reader.py
+│   ├── Wildfire_short_sample_2024.json
+│
+├── LICENSE
+├── README.md
+└── Final Reports (PDFs of analyses, PechaKucha presentation, etc.)
 ```
 
-### Folder and File Explanations
+---
 
-- **`data/GeoJSON Exports/`**: Contains wildfire data files sourced from the link provided by the professor ([ScienceBase.gov](https://www.sciencebase.gov/catalog/item/61707c2ad34ea36449a6b066)). These files include comprehensive wildfire metadata and datasets.
-  
-- **`data/`**: Includes both raw and processed data files used in this analysis:
-  - `aqi_gaseous.csv`, `aqi_particulate.csv`, and `aqi_yoy.csv`: CSV files containing AQI data for various pollutants, processed for analysis.
-  - `boulder_1800fires_final.json` and `boulder_fires_final.json`: Filtered JSON files that include only the fires within specific radii (650 miles and 1800 miles) around Boulder.
-  - `Smoke_Estimate_Annual.csv`: Contains yearly aggregated smoke estimates calculated from wildfire data, used in modeling and forecasting.
+## Data Sources and Descriptions
 
-- **`scripts/`**: Houses Jupyter notebooks for data analysis, model building, and example notebooks provided by the professor:
-  - `data-extraction-analysis.ipynb`: Main analysis notebook where data is processed, visualizations are generated, and SARIMA modeling is applied.
-  - `epa_air_quality_history_example.ipynb` and `wildfire_geo_proximity_example.ipynb`: Example notebooks from the professor that demonstrate accessing AQI data and calculating wildfire proximity.
+### Wildfire Data
+- **Source**: US Geological Survey (USGS)
+- **Description**: Combined wildland fire polygons dataset spanning 1961–2021, filtered to include fires within a 650-mile radius of Boulder.
+- **Usage**: Used to calculate annual smoke impacts based on fire size and distance.
 
-- **`wildfire/`**: Contains helper files provided by the professor, such as `Reader.py` for parsing wildfire data and a sample JSON file for testing.
+### Mortality Data
+- **Source**: CDC Wonder API
+- **Description**: Mortality rates and population data for Boulder, focusing on respiratory-related causes of death (1999–2020).
+- **Usage**: Correlated with smoke estimates to analyze health impacts.
 
-### Project Overview
+### Air Quality Data
+- **Source**: EPA Air Quality System (AQS) API
+- **Description**: Historical AQI data for Boulder, including trends in particulate and gaseous pollutants.
+- **Usage**: Validated smoke estimates and provided additional insights into air quality impacts.
 
-The main objectives of this project are:
-1. **Quantify Smoke Impact**: Calculate annual smoke exposure estimates based on proximity and size of wildfires around Boulder, CO.
-2. **Forecast Future Smoke Exposure**: Use SARIMA time series models to forecast smoke estimates for the next 25 years.
-3. **Correlate Wildfire Activity with AQI**: Analyze how smoke exposure estimates align with historical AQI data to understand potential impacts on air quality.
+---
 
-### Key Methods and Techniques
+## Methodology
 
-1. **Data Processing**:
-   - **Filtering Fires by Distance**: Using provided wildfire data, fires within specific distance thresholds (650 miles and 1800 miles) of Boulder are selected. This allows us to focus on fires that are most likely to impact Boulder’s air quality.
-   - **Annual Aggregation of Smoke Estimates**: Each fire’s smoke impact is calculated using its size and distance from Boulder, and then summed annually to get yearly smoke estimates.
+### 1. Smoke Impact Calculation
+**Formula**:  
+\[
+\text{Smoke Impact} = \frac{\text{Fire Size in Acres} \times \alpha}{\text{Distance from Boulder}^2}
+\]  
+where \( \alpha = 15.625 \) is a scaling factor to standardize the smoke impact.
 
-2. **Calculating Smoke Impact**:
-   ### Calculating Smoke Impact
+**Steps**:
+- Filter fires occurring between May and October (wildfire season).
+- Aggregate smoke impact values annually.
 
-The smoke impact for each fire is calculated using this formula:
+---
 
-**Smoke Impact** = (GIS Acres × 15.625) / Distance
+### 2. Mortality Rate Analysis
+- Calculated annual respiratory-related mortality rates per 100,000 population.
+- Focused on causes like chronic lower respiratory diseases and pneumonia.
 
-In this formula:
-- **GIS Acres** represents the area of the fire in acres.
-- **Distance** is the distance of the fire from Boulder in miles.
-- The constant **15.625** is applied as a scaling factor to adjust the impact measurement. The formula implies that closer fires have a proportionally larger smoke impact on Boulder’s air quality.
+---
 
-3. **Time Series Modeling**:
-   - **SARIMA**: Seasonal ARIMA (SARIMA) is applied to forecast smoke exposure from wildfires up to 2050. The model accounts for both trend and seasonality in the historical smoke estimate data.
-   - **Validation and Forecasting**: The model is trained on historical data, validated on a holdout set, and used to generate future forecasts with 95% confidence intervals.
+### 3. Data Integration
+- Merged wildfire, mortality, and AQI data on a yearly basis.
+- Addressed missing data and ensured alignment across datasets.
 
-### Visualizations
+---
 
-1. **Histogram of Fire Distances**: A histogram showing the distribution of fires by their distance from Boulder, with a cutoff at 650 miles. This visualization helps in understanding the spatial spread of fires impacting Boulder.
-   
-2. **Total Acres Burned per Year**: A line plot showing annual variation in total burned acres within 650 miles of Boulder. This highlights temporal patterns and any trends in fire severity over time.
-   
-3. **Comparison of Smoke Estimates and AQI**: A line plot that overlays smoke exposure estimates and AQI values for Boulder. This visualization aims to reveal correlations between wildfire activity and air quality changes.
-   
-4. **SARIMA Model Predictions on Original Data**: This plot shows the SARIMA model's predictions for smoke estimates over the validation set, providing insight into model accuracy.
+### 4. Predictive Modeling
+- **Model**: Seasonal ARIMA (SARIMA) to forecast smoke exposure up to 2050.
+- **Validation**: Model predictions validated using historical data and residual normality tests.
 
-5. **SARIMA Model Predictions on Smoothed Data**: For improved readability, the SARIMA predictions are plotted on smoothed data, which reduces noise and better illustrates trend patterns.
+---
 
-6. **Normality Test on Residuals**: A Q-Q plot to assess the normality of residuals from the SARIMA model. Three statistical tests (Shapiro-Wilk, Anderson-Darling, and D’Agostino's K-squared) confirm the residuals follow a normal distribution, validating model assumptions.
+## Visualizations
 
-7. **Forecast with 95% Confidence Intervals**: A final plot showing the SARIMA model's forecasted smoke estimates up to 2050 with confidence intervals. This is crucial for understanding the uncertainty in predictions.
+1. **Histogram of Fires by Distance**: Distribution of wildfires by their proximity to Boulder, with a cutoff at 650 miles.
+2. **Total Acres Burned per Year**: Temporal variation in burned acres within 650 miles of Boulder.
+3. **Trends in Smoke Impact and Mortality Rates**: Correlation between smoke exposure and respiratory mortality rates.
+4. **Correlation Heatmaps**: Relationships between variables like population, smoke impact, and mortality.
+5. **SARIMA Predictions**: Forecasts for smoke impacts with confidence intervals.
+6. **Cause-Specific Mortality Trends**: Focused on specific respiratory diseases like pneumonia.
 
-### Installation and Usage
+---
 
-#### Requirements
+## Key Findings
 
-- Python 3.x
-- Required packages: `pandas`, `numpy`, `matplotlib`, `statsmodels`, `pmdarima`, `geopy`, `fiona`, `shapely`
+### Trends in Smoke Impact and Mortality Rates
+- Positive correlation observed between smoke impact and respiratory mortality rates.
+- Significant peaks in smoke impact coincided with wildfire seasons.
 
-#### Running the Analysis
+---
 
-Clone the repository:
-```bash
-git clone https://github.com/radhikasethi2011/data-512-Final-Project.git
-```
+### Cause-Specific Mortality Analysis
+- Chronic lower respiratory diseases and pneumonia were the most impacted causes.
+- Highlights the need for targeted interventions during wildfire seasons.
 
-1. Navigate to the project directory and open `data-extraction-analysis.ipynb` in Jupyter Notebook or Jupyter Lab.
-2. Run each cell sequentially to reproduce the analysis, visualizations, and model predictions.
+---
 
-### Reflection
+### Predictive Insights
+- SARIMA forecasts indicate increasing smoke exposure in Boulder.
+- Suggests proactive wildfire mitigation and public health preparedness.
 
-This project required collaboration on key steps like accessing AQI data, wildfire filtering, and model validation. Working with example notebooks from the professor, such as the EPA air quality history example and wildfire proximity example, significantly accelerated the process and provided a strong foundation. Collaborating with peers helped refine the approach and ensured a comprehensive analysis. 
+---
 
-### Acknowledgments
+### Air Quality Validation
+- AQI trends corroborate smoke impact estimates, highlighting wildfire smoke's role in deteriorating air quality.
 
-- **Professor’s Resources**: The AQI and wildfire data examples were instrumental in setting up data processing pipelines.
-- **Libraries and Tools**: Python libraries such as `pandas`, `statsmodels`, and `matplotlib` were essential for data handling, model building, and visualization.
+---
 
-### License
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Limitations
+
+1. **Data Granularity**: Lack of fine-grained spatial or temporal resolution in some datasets.
+2. **Simplified Assumptions**: Smoke impact formula does not account for wind patterns or fire duration.
+3. **Confounding Factors**: Socioeconomic variables and healthcare access were not included.
+
+---
+
+## Conclusion
+
+This project underscores the significant public health impacts of wildfire smoke in Boulder. Findings advocate for enhanced wildfire mitigation strategies and healthcare interventions to protect vulnerable populations. Future research should incorporate more granular data and explore socioeconomic factors to provide a holistic understanding of wildfire impacts.
+
+---
+
+## Installation and Usage
+
+### Requirements
+- **Python 3.8+**
+- Libraries: `pandas`, `numpy`, `matplotlib`, `seaborn`, `geopandas`, `statsmodels`, `fiona`, `shapely`, `scikit-learn`
+
+### Steps to Run
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/radhikasethi2011/data-512-Final-Project.git
+   ```
+2. Install the required libraries:
+   ```bash
+   pip install pandas numpy matplotlib seaborn geopandas statsmodels scikit-learn
+   ```
+3. Open and run `data-extraction-analysis.ipynb` for initial data processing.
+4. Use `part-2-analysis.ipynb` for extended analysis and modeling.
+
+---
+
+## Acknowledgments
+
+- **Professor’s Resources**: Example notebooks and datasets provided a strong foundation for this project.
+- **Open-Source Tools**: Python libraries like `statsmodels` and `matplotlib` were instrumental in analysis and visualization.
+
+---
+
+## References
+
+1. **USGS Wildfire Data**: [ScienceBase.gov](https://www.sciencebase.gov/catalog/item/61707c2ad34ea36449a6b066)
+2. **CDC Wonder API**: [CDC Wonder](https://wonder.cdc.gov/)
+3. **EPA Air Quality System**: [EPA AQS API](https://www.epa.gov/aqs)
 
